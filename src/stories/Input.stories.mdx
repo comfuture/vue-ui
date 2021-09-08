@@ -1,0 +1,119 @@
+import { Meta, Story, Canvas, ArgsTable } from '@storybook/addon-docs';
+import UiInput, { UiNumberInput, UiDateInput } from '../components/input';
+import UiConfigProvider from '../components/config-provider';
+
+<Meta title="Components/Input"
+  component={UiInput}
+/>
+
+# Basic Usage
+```html
+<ui-input v-model="name" />
+```
+
+<Canvas>
+  <Story name="Basic usage">{{
+    components: { UiInput },
+    data: () => ({str: 'hello'}),
+    template: '<ui-input v-model="str"></ui-input>'
+  }}</Story>
+</Canvas>
+
+# Number Inputs
+```html
+<ui-number-input v-model="number" />
+<ui-number-input format v-model="number" />
+<ui-number-input format currency="KRW" v-model="number" />
+```
+
+<Canvas>
+  <Story name="Number Input">{{
+    components: { UiNumberInput },
+    data: () => ({number: 1234.567}),
+    template: '<ui-number-input v-model="number"></ui-number-input>'
+  }}</Story>
+  <Story name="Formatted Number Input">{{
+    components: { UiNumberInput },
+    data: () => ({number: 1234.567}),
+    template: '<ui-number-input format v-model="number"></ui-number-input>'
+  }}</Story>
+  <Story name="Currency Input">{{
+    components: { UiNumberInput },
+    data: () => ({number: 1234.567}),
+    template: '<ui-number-input format currency="KRW" v-model="number"></ui-number-input>'
+  }}</Story>
+</Canvas>
+
+## Properties
+<ArgsTable of={UiNumberInput} />
+
+## i18n
+
+`ui-number-input` 은 브라우져 또는 서버의 언어를 감지하여 숫자를 포메팅 하는데 사용합니다.
+
+따로 설정하지 않은 경우 브라우져에서는 `navigator.language` 를 우선 사용하며, 서버사이드 렌더링시에는 `LANG` 환경변수를 참조합니다.
+임의로 언어를 변경하고자 할 때는 `LC_MESSAGES` 변수를 `provide()` 하거나 `ui-config-provider` 컴포넌트로 감싸 `lang` 속성을 하위 컴포넌트들에 전달하면 됩니다.
+
+```html
+<template>
+  <!-- 제공된 LC_MESSAGES 에 따라 de 로 포메팅 -->
+  <ui-number-input format v-model="number" />
+
+  <!-- 하위 컴포넌트들에 대해 설정을 변경하여 es 로 포메팅 -->
+  <ui-config-provider lang="es">
+    <ui-number-input format v-model="number" />
+  </ui-config-provider>
+</template>
+<script type="ts">
+import { defineComponent, ref, provide } from 'vue'
+
+export default defineComponent({
+  setup() {
+    // 하위 컴포넌트의 언어 및 포메팅을 독일어로 변경
+    provide('LC_MESSAGES', 'de')
+    const number = ref(1234.56)
+    return { number }
+  }
+})
+</script>
+```
+
+아래 예제는 언어를 독일어(de)로 설정하여 자릿수 구분자가 `.`로, 소숫점 구분자가 `,` 로 포메팅 되고 있는 것을 보여줍니다.
+<Canvas>
+  <Story name="i18n">{{
+    components: { UiConfigProvider, UiNumberInput },
+    data: () => ({number: 1234.567}),
+    template: `
+    Deutch numbers: {{ number }} =>
+    <ui-config-provider lang="de">
+      <ui-number-input format v-model="number"></ui-number-input>
+      <ui-number-input format currency="EUR" v-model="number"></ui-number-input>
+    </ui-config-provider>`
+  }}</Story>
+</Canvas>
+
+&lt;!> 주의! 현재 알파버전에서는 currency 포메팅을 포함할 때 currency sign 이 나중에 붙는 언어들과, currency의 액면이 커서 기본으로 소숫점을 포함하는 통화일 경우에 값을 지우는(backspace) 동작에 오류가 있습니다.
+
+## Date Inputs
+
+시스템 date picker 가 포함된 날짜 입력기를 표시합니다. 네이티브 날짜입력(`[type="date"]` 및 `[type="datetime-local"]`)과 다른점은,
+작은 달력 아이콘 영역뿐 아니라 입력란 전체에 대해 팝업을 표시하며 입력된 날짜 값은 브라우져 기본 언어 또는 지정된 언어로 포메팅되어 표시된다는 점입니다.
+플랫폼과 브라우져에 따라 날짜 선택기의 모양은 상이할 수 있습니다. 하지만 가장 우아하게 동작합니다.
+
+날짜 입력기 `[type="date"]` 및 `[type="datetime-local"]` 를 지원하지 않는 오래된 브라우져에 대한 폴백은 제공하지 **않습니다**.
+
+
+<Canvas>
+  <Story name="Date input">{{
+    components: { UiConfigProvider, UiDateInput },
+    template: `
+    <h3>기본 언어로 포메팅되는 날짜 입력기</h3>
+    <ui-date-input /> | 
+    <ui-date-input time />
+    <h3>지정된(ja) 언어로 포메팅되는 날짜 입력기</h3>
+    <ui-config-provider lang="ja">
+      <ui-date-input /> | 
+      <ui-date-input time />
+    </ui-config-provider>`
+  }}</Story>
+</Canvas>
