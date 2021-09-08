@@ -8,7 +8,7 @@
   </teleport>
 </template>
 <script lang="ts">
-import { defineComponent, PropType, ref } from 'vue-demi'
+import { defineComponent, PropType } from 'vue-demi'
 
 export default defineComponent({
   name: 'ui-backdrop',
@@ -22,18 +22,18 @@ export default defineComponent({
       default: () => false
     }
   },
-  setup(props, {emit}) {
-    const dismiss = (event: any) => {
-      const isBox = event?.target.closest('.box')?.classList
-      if (isBox) {
-        return
-      }
-      if (props.dismissable) {
-        emit('update:modelValue', false)
+  setup(props, { emit }) {
+    return {
+      dismiss(event: any) {
+        const isBox = event?.target.closest('.box')?.classList
+        if (isBox) {
+          return
+        }
+        if (props.dismissable) {
+          emit('update:modelValue', false)
+        }
       }
     }
-
-    return { dismiss }
   }
 })
 </script>

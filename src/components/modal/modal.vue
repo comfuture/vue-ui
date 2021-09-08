@@ -73,7 +73,9 @@ export default defineComponent({
       dismiss()
     }
 
-    return { handleOk, dismiss }
+    return {
+      handleOk, dismiss
+    }
   },
 })
 </script>
