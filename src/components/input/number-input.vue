@@ -5,7 +5,7 @@
     @keydown="handleKeyDown">
 </template>
 <script lang="ts">
-import { computed, inject, defineComponent, PropType, toRefs } from 'vue-demi'
+import { computed, inject, defineComponent, PropType, toRefs, ref } from 'vue-demi'
 
 export default defineComponent({
   props: {
@@ -23,9 +23,9 @@ export default defineComponent({
   },
   setup(props, { emit }) {
     const { modelValue, format: needFormat, currency } = toRefs(props)
-    const LC_MESSAGES = inject('LC_MESSAGES', window?.navigator?.language
+    const lang = inject('LC_MESSAGES', ref(window?.navigator?.language
       || process.env.LANG
-      || 'ko')
+      || 'ko'))
     const handleKeyDown = (e: KeyboardEvent) => {
       console.log(e.key)
     }
@@ -42,11 +42,11 @@ export default defineComponent({
       const options = currency.value ? {
         style: 'currency', currency: currency.value!.toUpperCase()
       } : {}
-      const currencySymbol = Intl.NumberFormat(LC_MESSAGES, options)
+      const currencySymbol = Intl.NumberFormat(lang.value, options)
         .formatToParts(1)
         .filter(({type}) => type === 'currency')[0]?.value
-      const thousandSeparator = Intl.NumberFormat(LC_MESSAGES).format(11111).replace(/\p{Number}/gu, '');
-      const decimalSeparator = Intl.NumberFormat(LC_MESSAGES).format(1.1).replace(/\p{Number}/gu, '');
+      const thousandSeparator = Intl.NumberFormat(lang.value).format(11111).replace(/\p{Number}/gu, '');
+      const decimalSeparator = Intl.NumberFormat(lang.value).format(1.1).replace(/\p{Number}/gu, '');
 
       return parseFloat(value
           .replace(/\s/, '')
@@ -60,7 +60,7 @@ export default defineComponent({
         const options = currency.value ? {
           style: 'currency', currency: currency.value!.toUpperCase()
         } : {}
-        const formatter = new Intl.NumberFormat(LC_MESSAGES, options)
+        const formatter = new Intl.NumberFormat(lang.value, options)
         return formatter.format(+(modelValue.value || 0))
       }
       return modelValue.value
