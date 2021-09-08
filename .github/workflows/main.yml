@@ -16,6 +16,9 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
+    - name: install dependencies
+      run: npm ci
+
     - name: build storybook
       run: npm run build:docs
 
